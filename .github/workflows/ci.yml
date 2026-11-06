@@ -1,0 +1,27 @@
+name: Verify Slotbook
+on: [push, pull_request]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: slotbook
+          POSTGRES_PASSWORD: slotbook
+          POSTGRES_DB: slotbook_test
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U slotbook"
+          --health-interval 3s --health-timeout 3s --health-retries 20
+    env:
+      TEST_DATABASE_URL: postgres://slotbook:slotbook@localhost:5432/slotbook_test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - run: npm test
