@@ -1,0 +1,547 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Slotbook — Booking with Confidence</title>
+  <style>
+    :root {
+      --ink: #1a2433;
+      --navy: #111d2d;
+      --green: #2d6b5a;
+      --mint: #dff4ea;
+      --paper: #f7f8f5;
+      --muted: #617085;
+      --line: #dce4e2;
+      --soft: #edf3ef;
+      --gold: #e8c56a;
+      --white: #fff;
+      --red: #a6524a;
+    }
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0; height: 100%;
+      font-family: Inter, "Segoe UI", Arial, sans-serif;
+      background: var(--navy);
+      color: var(--ink);
+    }
+    body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      overflow: hidden;
+    }
+    .deck {
+      position: relative;
+      width: min(1280px, 100%);
+      height: min(720px, calc(100vh - 110px));
+      background: var(--paper);
+      border-radius: 18px;
+      overflow: hidden;
+      box-shadow: 0 32px 80px rgba(0,0,0,0.26);
+      border: 1px solid rgba(255,255,255,0.12);
+    }
+    .slide {
+      position: absolute;
+      inset: 0;
+      display: none;
+      padding: 60px 78px 34px 78px;
+    }
+    .slide.active { display: block; }
+    .slide::before {
+      content: "";
+      position: absolute;
+      inset: 0 auto 0 0;
+      width: 8px;
+      background: var(--green);
+    }
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 11px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--green);
+      font-weight: 800;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 12px;
+      letter-spacing: 0.13em;
+      text-transform: uppercase;
+    }
+    .brand-mark {
+      width: 28px; height: 28px; border-radius: 9px;
+      display: grid; place-items: center;
+      background: var(--green); color: white; font-weight: 900;
+      font-size: 18px;
+    }
+    .eyebrow {
+      margin: 26px 0 12px;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--green);
+    }
+    h1, h2, h3, p {
+      margin-top: 0;
+    }
+    h1 {
+      font-size: clamp(34px, 4vw, 66px);
+      line-height: 0.98;
+      letter-spacing: -0.06em;
+      margin: 0 0 18px 0;
+      max-width: 880px;
+    }
+    h2 {
+      font-size: clamp(26px, 3vw, 46px);
+      line-height: 1.02;
+      letter-spacing: -0.05em;
+      margin: 0 0 16px 0;
+      max-width: 900px;
+    }
+    h3 {
+      margin: 0 0 8px 0;
+      font-size: 17px;
+    }
+    .subtitle {
+      font-size: clamp(17px, 1.7vw, 23px);
+      line-height: 1.42;
+      color: var(--muted);
+      max-width: 820px;
+    }
+    .pill-row {
+      display: flex; flex-wrap: wrap; gap: 10px;
+      margin-top: 24px;
+    }
+    .pill {
+      background: var(--mint);
+      color: #1f5447;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      padding: 7px 12px;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+    }
+    .link-row {
+      display: flex; flex-wrap: wrap; gap: 12px; margin-top: 26px;
+    }
+    .link-row a {
+      display: inline-flex; align-items: center; gap: 6px;
+      border: 1px solid var(--line);
+      border-radius: 10px; padding: 10px 14px;
+      font-size: 13px; font-weight: 700; text-decoration: none;
+      color: var(--ink); background: rgba(255,255,255,0.5);
+    }
+    .cover {
+      background: radial-gradient(circle at 80% 18%, rgba(210,245,228,0.9) 0%, rgba(210,245,228,0.9) 18%, transparent 36%),
+                  linear-gradient(180deg, #f7f8f5 0%, #f7f8f5 100%);
+    }
+    .cover .content {
+      position: relative; z-index: 1; margin-top: 18px;
+    }
+    .cover::after {
+      content: "";
+      position: absolute; right: -110px; bottom: -130px;
+      width: 500px; height: 500px; border-radius: 50%;
+      background: rgba(14,87,67,0.04);
+      border: 1px solid rgba(14,87,67,0.22);
+      box-shadow: 0 0 0 40px rgba(14,87,67,0.03), 0 0 0 94px rgba(14,87,67,0.02);
+    }
+    .accent { color: var(--green); }
+    .muted { color: var(--muted); }
+    .grid {
+      display: grid; gap: 16px; margin-top: 20px;
+    }
+    .two-col { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .three-col { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .card {
+      background: rgba(255,255,255,0.8);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 18px 18px 16px;
+      box-shadow: 0 6px 16px rgba(18,31,54,0.04);
+    }
+    .card h3 { font-size: 17px; }
+    .card p, .card li {
+      margin: 0;
+      font-size: 14px;
+      line-height: 1.45;
+      color: #45566d;
+    }
+    .card ul { margin: 10px 0 0 18px; padding: 0; }
+    .card li + li { margin-top: 5px; }
+    .callout {
+      margin-top: 16px;
+      background: var(--navy);
+      color: #edf4f1;
+      border-radius: 12px;
+      padding: 16px 18px;
+      font-size: 14px; line-height: 1.5;
+    }
+    .callout strong { color: #b5ebd3; }
+    .flow {
+      display: grid; grid-template-columns: repeat(5, minmax(110px,1fr)); gap: 18px;
+      margin-top: 28px;
+    }
+    .step {
+      position: relative; border: 1px solid var(--line); border-radius: 14px;
+      background: rgba(255,255,255,0.8); padding: 18px 12px 14px; min-height: 140px;
+    }
+    .step:not(:last-child)::after {
+      content: "→"; position: absolute; right: -16px; top: 50%; transform: translateY(-50%);
+      font-size: 26px; color: var(--green); font-weight: 800;
+    }
+    .step .num {
+      width: 26px; height: 26px; display: grid; place-items: center; border-radius: 50%;
+      background: var(--mint); color: var(--green); font-size: 12px; font-weight: 900;
+      margin-bottom: 10px;
+    }
+    .step b { display: block; font-size: 13px; margin-bottom: 4px; }
+    .step span { font-size: 12px; color: var(--muted); line-height: 1.45; }
+    .schema {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 10px 20px; margin-top: 18px;
+    }
+    .schema-item {
+      border-bottom: 1px solid var(--line); padding: 10px 0;
+    }
+    .schema-item b { display: block; font-size: 14px; margin-bottom: 3px; }
+    .schema-item p { font-size: 12px; color: var(--muted); line-height: 1.42; }
+    .decision {
+      display: flex; gap: 12px; align-items: flex-start;
+      border: 1px solid var(--line); background: rgba(255,255,255,0.8); border-radius: 12px; padding: 14px 14px;
+    }
+    .decision .num {
+      width: 26px; height: 26px; border-radius: 50%; background: var(--mint); color: var(--green);
+      display: grid; place-items: center; font-weight: 900; font-size: 12px; flex: 0 0 auto;
+    }
+    .decision p { font-size: 13px; line-height: 1.45; color: #42556d; }
+    .decision b { color: var(--ink); }
+    .stats {
+      display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 16px;
+      margin-top: 16px;
+    }
+    .stat {
+      background: rgba(255,255,255,0.8); border: 1px solid var(--line); border-radius: 14px;
+      padding: 18px 18px 16px;
+    }
+    .stat .label { font-size: 11px; letter-spacing: 0.14em; color: var(--green); font-weight: 800; text-transform: uppercase; }
+    .stat .value {
+      font-size: clamp(28px, 3vw, 44px); font-weight: 900; letter-spacing: -0.06em;
+      color: var(--green); margin-top: 12px;
+    }
+    .stat p { margin-top: 8px; font-size: 13px; color: var(--muted); }
+    .timeline {
+      display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 14px; margin-top: 18px;
+    }
+    .timebox {
+      background: rgba(255,255,255,0.8); border: 1px solid var(--line); border-radius: 12px; padding: 16px 12px; text-align: center;
+    }
+    .timebox .small { font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--green); font-weight: 800; }
+    .timebox b { display: block; margin: 12px 0 6px; font-size: 20px; }
+    .timebox span { font-size: 12px; color: var(--muted); }
+    .footer {
+      position: absolute; left: 78px; right: 78px; bottom: 18px;
+      display: flex; justify-content: space-between; align-items: center;
+      color: #7c8a8c; font-size: 10px; font-weight: 700;
+      letter-spacing: 0.08em; text-transform: uppercase;
+    }
+    .controls {
+      width: min(1280px, 100%);
+      display: flex; align-items: center; justify-content: center;
+      gap: 14px; margin-top: 14px;
+      color: white;
+    }
+    .controls button {
+      border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.08);
+      color: white; font: inherit; border-radius: 10px; padding: 10px 14px; cursor: pointer;
+    }
+    .progress {
+      width: min(220px, 35vw); height: 4px; border-radius: 999px; background: rgba(255,255,255,0.2); overflow: hidden;
+    }
+    .progress i {
+      display: block; height: 100%; width: 10%; border-radius: inherit; background: #a9ebcf;
+      transition: width 0.2s ease;
+    }
+    .count { min-width: 52px; text-align: center; font-size: 12px; }
+    @media (max-width: 900px) {
+      body { padding: 10px; }
+      .deck { height: calc(100vh - 90px); }
+      .slide { padding: 42px 40px 26px 40px; }
+      .footer { left: 40px; right: 40px; }
+      .two-col, .three-col, .grid, .flow, .schema, .timeline, .stats { grid-template-columns: 1fr; }
+      .flow { gap: 14px; }
+      .step:not(:last-child)::after { content: "↓"; right: 50%; top: auto; bottom: -18px; transform: translateX(50%); }
+    }
+    @media print {
+      body { background: white; padding: 0; }
+      .deck { width: 100vw; height: 100vh; border-radius: 0; }
+      .controls { display: none; }
+      .slide { display: block !important; position: relative !important; page-break-after: always; }
+      .slide:not(.active) { display: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="deck">
+    <section class="slide active cover">
+      <div class="topbar">
+        <div class="brand"><span class="brand-mark">s</span> Slotbook</div>
+        <div>Take-home · Nov 2026</div>
+      </div>
+      <div class="content" style="margin-top: 36px;">
+        <div class="eyebrow">Booking system built around correctness</div>
+        <h1>Booking with <span class="accent">confidence.</span></h1>
+        <p class="subtitle">A full-stack scheduling app for hosts and guests. Local-time scheduling on the surface, serialized database coordination underneath.</p>
+        <div class="pill-row">
+          <span class="pill">React + Vite</span>
+          <span class="pill">Express 5</span>
+          <span class="pill">PostgreSQL</span>
+          <span class="pill">Time zones</span>
+        </div>
+        <div class="link-row">
+          <a href="https://github.com/Avinaash076/booking-system" target="_blank">↗ GitHub repo</a>
+          <a href="https://booking-system-5vtu.onrender.com/" target="_blank">↗ Live demo</a>
+          <a href="https://github.com/Avinaash076/booking-system/blob/main/docs/REPORT.pdf" target="_blank">↗ PDF report</a>
+        </div>
+      </div>
+      <div class="footer"><span>Slotbook · Architecture, reliability & handoff</span><span>01 / 10</span></div>
+    </section>
+
+    <section class="slide">
+      <div class="topbar"><div class="brand"><span class="brand-mark">s</span> Slotbook</div><div>02 / Architecture</div></div>
+      <div class="eyebrow">01 · Architecture</div>
+      <h2>One authoritative booking path.</h2>
+      <p class="subtitle">The client chooses. The database decides. Every capacity-changing request passes through the same host lock.</p>
+      <div class="flow">
+        <div class="step"><div class="num">1</div><b>React guest/host UI</b><span>Browse, hold, confirm, manage</span></div>
+        <div class="step"><div class="num">2</div><b>Express JSON API</b><span>Validate input and auth</span></div>
+        <div class="step"><div class="num">3</div><b>Postgres transaction</b><span>Idempotency lock → host row lock</span></div>
+        <div class="step"><div class="num">4</div><b>Check and write</b><span>Fresh clock, schedule, occupancy</span></div>
+        <div class="step"><div class="num">5</div><b>Commit</b><span>Booking + notification sink</span></div>
+      </div>
+      <div class="grid two-col">
+        <div class="card">
+          <h3>Hold request flow</h3>
+          <p>Require an offset-bearing ISO instant and Idempotency-Key. Resolve the requested host and event. Never trust the client to decide availability.</p>
+        </div>
+        <div class="card">
+          <h3>Confirmation and change</h3>
+          <p>Re-lock the host, verify live state, and commit the booking plus notification in one transaction. Reschedule validates the destination before moving.</p>
+        </div>
+      </div>
+      <div class="callout"><strong>Consistency boundary:</strong> availability reads, booking writes, and host schedule edits all use the same host row lock. Different hosts proceed independently.</div>
+      <div class="footer"><span>Source: README · server/booking.ts</span><span>02 / 10</span></div>
+    </section>
+
+    <section class="slide">
+      <div class="topbar"><div class="brand"><span class="brand-mark">s</span> Slotbook</div><div>03 / Data model</div></div>
+      <div class="eyebrow">02 · Data model</div>
+      <h2>Constraints first. Coordination where it belongs.</h2>
+      <p class="subtitle">Postgres stores real instants. Availability remains local-wall-clock based with IANA time zones.</p>
+      <div class="schema">
+        <div class="schema-item"><b>hosts</b><p>UUID PK, unique handle, IANA timezone, password hash. Row is the serialization lock for all scheduling changes.</p></div>
+        <div class="schema-item"><b>events</b><p>Host FK, unique (host, slug), duration 15–120 minutes, capacity 1–100, buffer/notice/horizon checks.</p></div>
+        <div class="schema-item"><b>weekly_windows</b><p>ISO weekday 1–7, start/end minute values, valid non-overlapping intervals for recurring schedules.</p></div>
+        <div class="schema-item"><b>date_overrides</b><p>Composite PK (host, date), JSON array replaces weekly hours; empty array means a day off.</p></div>
+        <div class="schema-item"><b>bookings</b><p>UUID, host/event, status, start/end, buffered busy intervals, expiry, guest details, private manage token.</p></div>
+        <div class="schema-item"><b>idempotency_keys</b><p>Key PK, fingerprint, booking FK. Same request retry returns the original hold; changed payload is rejected.</p></div>
+        <div class="schema-item"><b>notifications</b><p>Append-only confirmation, reschedule and cancellation events recorded in the same transaction as booking changes.</p></div>
+        <div class="schema-item"><b>sessions</b><p>Hashed token PK, host reference, expiration, invalidated at logout and when expired.</p></div>
+      </div>
+      <div class="callout"><strong>Invariant split:</strong> keys, foreign keys, uniqueness and checks live in the schema; overlap logic and group capacity are enforced under the locked host row.</div>
+      <div class="footer"><span>Source: migrations/001_core.sql</span><span>03 / 10</span></div>
+    </section>
+
+    <section class="slide">
+      <div class="topbar"><div class="brand"><span class="brand-mark">s</span> Slotbook</div><div>04 / Key decisions</div></div>
+      <div class="eyebrow">03 · Key decisions</div>
+      <h2>Seven deliberate choices that protect correctness.</h2>
+      <div class="grid two-col" style="margin-top: 16px;">
+        <div class="decision"><div class="num">1</div><p><b>Host-level row lock.</b> Instead of locking events or slots, this covers all event types for the same host and handles multi-seat capacity.</p></div>
+        <div class="decision"><div class="num">2</div><p><b>Database clock after lock.</b> Expiry is evaluated only after the lock is acquired, so waiting requests use fresh time.</p></div>
+        <div class="decision"><div class="num">3</div><p><b>Live expiry predicate.</b> Capacity excludes expired holds immediately without a background worker.</p></div>
+        <div class="decision"><div class="num">4</div><p><b>Idempotency fingerprints.</b> Same key + same normalized payload replays; changed payload fails with 409.</p></div>
+        <div class="decision"><div class="num">5</div><p><b>Atomic reschedule.</b> One booking moves or fails without partial cancel-then-create behavior.</p></div>
+        <div class="decision"><div class="num">6</div><p><b>Real UTC instants + local windows.</b> DST gaps and repeats are handled correctly with IANA zones.</p></div>
+        <div class="decision"><div class="num">7</div><p><b>Transactional notification sink.</b> Confirmation, reschedule, and cancellation are recorded with the booking, not in a separate ad hoc process.</p></div>
+        <div class="card"><h3 style="margin-bottom:10px;">Trade-off</h3><p>Host serialization is simple and correct, but it can limit throughput for a single very busy host. Measure before changing the design.</p></div>
+      </div>
+      <div class="footer"><span>Source: README · server/booking.ts</span><span>04 / 10</span></div>
+    </section>
+
+    <section class="slide">
+      <div class="topbar"><div class="brand"><span class="brand-mark">s</span> Slotbook</div><div>05 / Reliability</div></div>
+      <div class="eyebrow">04 · Reliability</div>
+      <h2>Failure case → behavior → proof.</h2>
+      <div class="grid two-col">
+        <div class="card"><h3>Contention</h3><p>40 simultaneous holds yield exactly one winner for capacity 1 or three winners for capacity 3. <strong>Test:</strong> “40 simultaneous holds”.</p></div>
+        <div class="card"><h3>Retry / lost response</h3><p>Same key returns one hold; changed payload fails with 409. Confirmation retries emit one notification. <strong>Test:</strong> retry assertions.</p></div>
+        <div class="card"><h3>Expiry during wait</h3><p>An expired hold can fail confirmation once the lock is released, then allow a new hold. <strong>Test:</strong> lock-wait expiry check.</p></div>
+        <div class="card"><h3>Failed move</h3><p>Destination conflict returns 409 and preserves the original booking. Cancel frees capacity. <strong>Test:</strong> failed reschedule behavior.</p></div>
+        <div class="card"><h3>Buffer / cross-event conflicts</h3><p>Before/after buffers prevent adjacent event overlap. <strong>Test:</strong> overlapping event types and buffer conflicts.</p></div>
+        <div class="card"><h3>Bad input / auth / origin</h3><p>Invalid times, bad zones, unauthenticated host access and hostile origins are rejected. <strong>Test:</strong> validation and security coverage.</p></div>
+      </div>
+      <div class="callout"><strong>Remaining risk:</strong> public hold paths have no distributed bot protection or load benchmark. The login throttle is process-local, not edge-wide.</div>
+      <div class="footer"><span>Source: tests/integration.test.ts</span><span>05 / 10</span></div>
+    </section>
+
+    <section class="slide">
+      <div class="topbar"><div class="brand"><span class="brand-mark">s</span> Slotbook</div><div>06 / Time zones</div></div>
+      <div class="eyebrow">05 · Time zones</div>
+      <h2>Schedule by local clock. Reserve by instant.</h2>
+      <div class="grid two-col" style="margin-top: 14px;">
+        <div class="card">
+          <h3>How slots are generated</h3>
+          <ul>
+            <li>Resolve recurring weekly windows and date overrides.</li>
+            <li>Walk real UTC minutes across the host-local day.</li>
+            <li>Test each instant against open availability and busy intervals.</li>
+            <li>Offer quarter-hour local starts when the duration and buffers fit.</li>
+            <li>Return UTC instants and render them in the guest’s selected time zone.</li>
+          </ul>
+        </div>
+        <div>
+          <div class="eyebrow" style="margin-top: 0; margin-bottom: 10px;">Worked example · New York · 14 Mar 2027</div>
+          <div class="timeline">
+            <div class="timebox"><div class="small">Local start</div><b>01:45 EST</b><span>06:45 UTC</span></div>
+            <div class="timebox"><div class="small">DST jump</div><b>01:59 → 03:00</b><span>02:xx does not exist</span></div>
+            <div class="timebox"><div class="small">30 mins later</div><b>03:15 EDT</b><span>07:15 UTC</span></div>
+          </div>
+          <div class="callout" style="margin-top: 12px;"><strong>Fallback case:</strong> on 7 Nov 2027, 01:30 appears twice. They are distinct instants, not duplicate slots. The tests cover both DST transitions.</div>
+        </div>
+      </div>
+      <div class="footer"><span>Source: server/slots.ts · tests/slots.test.ts</span><span>06 / 10</span></div>
+    </section>
+
+    <section class="slide">
+      <div class="topbar"><div class="brand"><span class="brand-mark">s</span> Slotbook</div><div>07 / Optional extensions</div></div>
+      <div class="eyebrow">06 · Optional extensions</div>
+      <h2>Useful additions, connected to the same core.</h2>
+      <div class="grid two-col">
+        <div class="card"><h3>CI and validation</h3><p>GitHub Actions validates the app and maintains confidence that schema and concurrency changes don’t silently break.</p></div>
+        <div class="card"><h3>Health and logs</h3><p>Structured request IDs and a database-backed health endpoint make operation and debugging easier in live environments.</p></div>
+        <div class="card"><h3>Notification sink viewer</h3><p>Hosts can inspect durable confirmation, reschedule and cancellation events recorded with the booking lifecycle.</p></div>
+        <div class="card"><h3>Accessibility</h3><p>Native inputs, labels, and button patterns keep the guest and host flows keyboard-friendly and consistent.</p></div>
+      </div>
+      <div class="callout"><strong>Architecture fit:</strong> these features sit outside the core absolute correctness layer, but strengthen validation and operational clarity.</div>
+      <div class="footer"><span>Source: README · .github workflows · server/app.ts</span><span>07 / 10</span></div>
+    </section>
+
+    <section class="slide">
+      <div class="topbar"><div class="brand"><span class="brand-mark">s</span> Slotbook</div><div>08 / Testing</div></div>
+      <div class="eyebrow">07 · Testing</div>
+      <h2>Evidence, with honest limits.</h2>
+      <div class="stats">
+        <div class="stat"><div class="label">Unit</div><div class="value">5</div><p>Slot logic, DST gaps/folds, notice/horizon, overrides and capacity conflicts.</p></div>
+        <div class="stat"><div class="label">Integration</div><div class="value">9</div><p>Real Postgres tests for concurrency, idempotency, expiry, reschedule, auth and lock-wait behavior.</p></div>
+        <div class="stat"><div class="label">Result</div><div class="value">14 / 14</div><p>All tests passed on Node 22.20.0 with isolated Postgres 17.</p></div>
+      </div>
+      <div class="grid two-col" style="margin-top: 14px;">
+        <div class="card">
+          <h3>Run the suite</h3>
+          <p style="margin-top:8px; font-family: ui-monospace, monospace; font-size: 12px;">docker compose --profile test run --build --rm tests</p>
+          <p style="margin-top:10px; font-size: 13px;">Or set <span style="font-family: ui-monospace, monospace;">TEST_DATABASE_URL</span> and run <span style="font-family: ui-monospace, monospace;">npm test</span>.</p>
+        </div>
+        <div class="card">
+          <h3>What is not claimed</h3>
+          <p>No public load benchmark or browser E2E suite is claimed. Production verification is outstanding. Full Docker-stack validation was blocked by environment limits.</p>
+        </div>
+      </div>
+      <div class="footer"><span>Source: README · package.json · AI_LOG.md</span><span>08 / 10</span></div>
+    </section>
+
+    <section class="slide">
+      <div class="topbar"><div class="brand"><span class="brand-mark">s</span> Slotbook</div><div>09 / Using AI</div></div>
+      <div class="eyebrow">08 · Using AI</div>
+      <h2>Accelerated delivery, still checked.</h2>
+      <div class="grid three-col" style="margin-top: 6px;">
+        <div class="card"><h3>Where it helped</h3><p>AI helped interpret the assignment, scaffold the TypeScript app, write schema and transaction logic, and generate tests and docs from an empty repo.</p></div>
+        <div class="card"><h3>Where it helped again</h3><p>It surfaced concurrency edge cases like lock-wait expiry and DST behavior, which were made explicit in integration tests.</p></div>
+        <div class="card"><h3>Where it misled</h3><p>Environment issues—missing PDF library, Docker engine constraints and browser verification limits—were real. The log records the truth and no successful E2E claim is made.</p></div>
+      </div>
+      <div class="callout"><strong>Best practice:</strong> use AI to widen the solution space and identify edge cases, then ground claims in source, tests and explicit limitations.</div>
+      <div class="footer"><span>Source: AI_LOG.md</span><span>09 / 10</span></div>
+    </section>
+
+    <section class="slide">
+      <div class="topbar"><div class="brand"><span class="brand-mark">s</span> Slotbook</div><div>10 / Handoff</div></div>
+      <div class="eyebrow">09 · Gaps and next steps</div>
+      <h2>Make the demo production-ready.</h2>
+      <div class="grid two-col">
+        <div class="card"><h3>Known gaps</h3><ul>
+          <li>No real email delivery, calendar sync or reminders.</li>
+          <li>No waitlist, round-robin routing or production recovery workflow.</li>
+          <li>No distributed anti-abuse protection or public load benchmark.</li>
+          <li>Notification sink is durable intent, not a delivery queue.</li>
+        </ul></div>
+        <div class="card"><h3>Next steps</h3><ul>
+          <li>Run guest and host browser flows at desktop/mobile widths.</li>
+          <li>Add Playwright coverage and cold-start deployment checks.</li>
+          <li>Measure throughput under load and tune lock contention.</li>
+          <li>Replace demo credentials with a secure production auth and deployment path.</li>
+        </ul></div>
+      </div>
+      <div class="callout"><strong>Demo path:</strong> open guest page → switch timezone → browse slots → make a booking → show private manage link → reschedule or cancel → open host dashboard → close on architecture and test evidence.</div>
+      <div class="link-row" style="margin-top: 18px;">
+        <a href="https://github.com/Avinaash076/booking-system" target="_blank">GitHub repo ↗</a>
+        <a href="https://booking-system-5vtu.onrender.com/" target="_blank">Live demo ↗</a>
+        <a href="https://github.com/Avinaash076/booking-system/blob/main/docs/REPORT.pdf" target="_blank">PDF report ↗</a>
+      </div>
+      <div class="footer"><span>Slotbook · Thank you</span><span>10 / 10</span></div>
+    </section>
+  </div>
+
+  <div class="controls" aria-label="Presentation controls">
+    <button id="prev">← Previous</button>
+    <div class="progress"><i id="bar"></i></div>
+    <div class="count" id="count">1 / 10</div>
+    <button id="next">Next →</button>
+    <button id="print">Print / PDF</button>
+  </div>
+
+  <script>
+    const slides = [...document.querySelectorAll('.slide')];
+    const bar = document.getElementById('bar');
+    const count = document.getElementById('count');
+    let index = 0;
+
+    function render() {
+      slides.forEach((slide, i) => slide.classList.toggle('active', i === index));
+      bar.style.width = `${((index + 1) / slides.length) * 100}%`;
+      count.textContent = `${index + 1} / ${slides.length}`;
+    }
+
+    document.getElementById('prev').addEventListener('click', () => {
+      index = Math.max(0, index - 1); render();
+    });
+    document.getElementById('next').addEventListener('click', () => {
+      index = Math.min(slides.length - 1, index + 1); render();
+    });
+    document.getElementById('print').addEventListener('click', () => window.print());
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === ' ') {
+        e.preventDefault(); index = Math.min(slides.length - 1, index + 1); render();
+      }
+      if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+        e.preventDefault(); index = Math.max(0, index - 1); render();
+      }
+      if (e.key.toLowerCase() === 'p') window.print();
+      if (e.key === 'Home') { index = 0; render(); }
+      if (e.key === 'End') { index = slides.length - 1; render(); }
+    });
+
+    render();
+  </script>
+</body>
+</html>
